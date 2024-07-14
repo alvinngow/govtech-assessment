@@ -1,4 +1,4 @@
-type QuickSuggestResp = {
+export type QuickSuggestResp = {
   stemmedQueryTerm: string
   suggestions: string[]
 }

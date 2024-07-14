@@ -94,12 +94,14 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
       />
       {searchTerm.length > 0 && (
         <IconX
+          id='clearSearch'
           className='mr-2 text-zinc-400 cursor-pointer'
           onClick={() => {
             setSearchTerm('');
             inputRef.current?.focus();
             setIsInputFocused(true);
           }}
+          data-testid='clearSearch'
         />
       )}
       <SearchButton searchAction={handleSearchButtonClick}></SearchButton>

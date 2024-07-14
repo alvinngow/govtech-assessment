@@ -5,18 +5,21 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {SearchResp} from './queries/getSearchResults';
 import SearchResOptions from './components/search/SearchResOptions';
 
-const queryClient = new QueryClient();
+const defaultQueryClient = new QueryClient();
 
-function App() {
+type AppProps = {
+  queryClient?: QueryClient;
+};
+
+function App({queryClient = defaultQueryClient}: AppProps) {
   const [searchRes, setSearchRes] = useState<SearchResp | undefined>(undefined);
-  console.log('🚀 ~ App ~ searchRes:', searchRes);
 
   return (
     <QueryClientProvider client={queryClient}>
       <div>
-        <Masthead></Masthead>
+        <Masthead />
         <div className='h-36 shadow-md flex justify-center items-center'>
-          <SearchBar setSearchRes={setSearchRes}></SearchBar>
+          <SearchBar setSearchRes={setSearchRes} />
         </div>
         {searchRes && (
           <div className='w-full flex justify-center'>
@@ -32,9 +35,7 @@ function App() {
               </div>
               <div>
                 {searchRes.ResultItems.map((item) => (
-                  <SearchResOptions
-                    key={item.DocumentId}
-                    item={item}></SearchResOptions>
+                  <SearchResOptions key={item.DocumentId} item={item} />
                 ))}
               </div>
             </div>

@@ -16,7 +16,9 @@ const QuickSuggest: React.FC<QuickSuggestProps> = (props) => {
   } = props;
 
   return (
-    <div className='absolute top-full bg-white w-full mt-1 shadow-md'>
+    <div
+      className='absolute top-full bg-white w-full mt-1 shadow-md'
+      role='listbox'>
       {suggestions.map((suggestion, index) => {
         const boldedIndex = suggestion.indexOf(searchTerm);
         const frontText = suggestion.slice(0, boldedIndex);
@@ -29,7 +31,8 @@ const QuickSuggest: React.FC<QuickSuggestProps> = (props) => {
                 index == activeSuggestionIndex && 'bg-gray-200'
               }`}
               key={suggestion}
-              onMouseEnter={() => setActiveSuggestionIndex(index)}>
+              onMouseEnter={() => setActiveSuggestionIndex(index)}
+              role='option'>
               {frontText}
               <b>{searchTerm}</b>
               {backText}
