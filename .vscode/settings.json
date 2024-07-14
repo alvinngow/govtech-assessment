@@ -1,0 +1,42 @@
+{
+  "files.defaultLanguage": "javascript",
+  "editor.tabSize": 2,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "prettier.bracketSameLine": true,
+  "prettier.bracketSpacing": false,
+  "prettier.trailingComma": "all",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.suggestSelection": "first",
+  "editor.formatOnType": true,
+  "javascript.format.semicolons": "insert",
+  "typescript.format.semicolons": "insert",
+  "editor.linkedEditing": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.tabCompletion": "on",
+  "diffEditor.wordWrap": "off",
+  "javascript.referencesCodeLens.enabled": true,
+  "javascript.referencesCodeLens.showOnAllFunctions": true,
+  "editor.codeLensFontFamily": "consolas",
+  "editor.codeLens": false,
+  "diffEditor.codeLens": true,
+  "editor.detectIndentation": false,
+  "files.eol": "\n",
+  "html.format.indentInnerHtml": true,
+  "prettier.singleQuote": true,
+  "prettier.jsxSingleQuote": true,
+  "explorer.sortOrder": "type",
+  "eslint.format.enable": true,
+  "explorer.confirmDragAndDrop": false,
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.indentSize": "tabSize",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
