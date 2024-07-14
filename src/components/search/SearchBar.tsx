@@ -1,5 +1,5 @@
 import {IconX, IconZoomExclamation} from '@tabler/icons-react';
-import {useQuery, useQueryClient} from '@tanstack/react-query';
+import {useQueryClient} from '@tanstack/react-query';
 import React, {
   Dispatch,
   SetStateAction,
@@ -9,8 +9,9 @@ import React, {
   useState,
 } from 'react';
 import useDebounce from '../../hooks/useDebounce';
-import {getQuickSuggest} from '../../queries/getQuickSuggest';
+import {getQuickSuggest, QuickSuggestResp} from '../../queries/getQuickSuggest';
 import {getSearchResults, SearchResp} from '../../queries/getSearchResults';
+import Spinner from '../common/Spinner';
 import QuickSuggest from './QuickSuggest';
 import SearchButton from './SearchButton';
 
@@ -21,19 +22,29 @@ type SearchBarProps = {
 const SearchBar: React.FC<SearchBarProps> = (props) => {
   const {setSearchRes} = props;
   const [searchTerm, setSearchTerm] = useState('');
+  const [quickSuggestRes, setQuickSuggestRes] = useState<
+    QuickSuggestResp | undefined
+  >(undefined);
   const queryClient = useQueryClient();
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isQuickSuggestLoading, setIsQuickSuggestLoading] = useState(false);
   // If this was an actual backend, mutation would be used here along with the searchTerm as payload
   // Assumes that we're not using URL searchParams
-  const {data, status} = useQuery({
-    queryKey: ['quickSuggest'],
-    queryFn: getQuickSuggest,
-  });
+  const handleQuickSuggest = async () => {
+    setIsQuickSuggestLoading(true);
+    const data = await queryClient.fetchQuery({
+      queryKey: ['quickSuggest'],
+      queryFn: getQuickSuggest,
+    });
 
-  const handleSearchButtonClick = async () => {
+    setQuickSuggestRes(data);
+    setIsQuickSuggestLoading(false);
+  };
+
+  const handleSearch = async () => {
     const data = await queryClient.fetchQuery({
       queryKey: ['searchRes'],
       queryFn: getSearchResults,
@@ -42,9 +53,9 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
   };
 
   const filteredData = useMemo(() => {
-    if (data) {
+    if (quickSuggestRes) {
       const filteredList = [];
-      for (const suggestion of data.suggestions) {
+      for (const suggestion of quickSuggestRes.suggestions) {
         if (suggestion.indexOf(searchTerm) > -1) {
           filteredList.push(suggestion);
         }
@@ -56,7 +67,7 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
     }
 
     return [];
-  }, [data, searchTerm]);
+  }, [quickSuggestRes, searchTerm]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowDown') {
@@ -70,13 +81,13 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
     } else if (e.key === 'Enter') {
       setSearchTerm(filteredData![activeSuggestionIndex]);
       setActiveSuggestionIndex(0);
-      handleSearchButtonClick();
+      handleSearch();
       inputRef.current!.blur();
     }
   };
 
   useEffect(() => {
-    queryClient.invalidateQueries({queryKey: ['quickSuggest']});
+    handleQuickSuggest();
   }, [debouncedSearchTerm]);
 
   return (
@@ -104,8 +115,12 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
           data-testid='clearSearch'
         />
       )}
-      <SearchButton searchAction={handleSearchButtonClick}></SearchButton>
-      {status == 'pending' && <div></div>}
+      <SearchButton searchAction={handleSearch}></SearchButton>
+      {isQuickSuggestLoading && (
+        <div className=' flex justify-center items-center absolute top-full bg-white w-full mt-1 shadow-md h-32'>
+          <Spinner></Spinner>
+        </div>
+      )}
       {searchTerm.length > 2 &&
         isInputFocused &&
         (filteredData ? (
