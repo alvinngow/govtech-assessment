@@ -3,6 +3,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import React, {
   Dispatch,
   SetStateAction,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -21,28 +22,37 @@ type SearchBarProps = {
 
 const SearchBar: React.FC<SearchBarProps> = (props) => {
   const {setSearchRes} = props;
-  const [searchTerm, setSearchTerm] = useState('');
+  const queryClient = useQueryClient();
+
   const [quickSuggestRes, setQuickSuggestRes] = useState<
     QuickSuggestResp | undefined
   >(undefined);
-  const queryClient = useQueryClient();
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [searchTerm, setSearchTerm] = useState('');
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [isInputFocused, setIsInputFocused] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
   const [isQuickSuggestLoading, setIsQuickSuggestLoading] = useState(false);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
   // If this was an actual backend, mutation would be used here along with the searchTerm as payload
   // Assumes that we're not using URL searchParams
-  const handleQuickSuggest = async () => {
+  const handleQuickSuggest = useCallback(async () => {
     setIsQuickSuggestLoading(true);
-    const data = await queryClient.fetchQuery({
+    const res = await queryClient.fetchQuery({
       queryKey: ['quickSuggest'],
       queryFn: getQuickSuggest,
     });
 
-    setQuickSuggestRes(data);
+    if (res.ok) {
+      const data = await res.json();
+      setQuickSuggestRes(data);
+    } else {
+      alert('Something went wrong, please try again');
+    }
     setIsQuickSuggestLoading(false);
-  };
+  }, [queryClient]);
 
   const handleSearch = async () => {
     const data = await queryClient.fetchQuery({
@@ -72,23 +82,25 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowDown') {
       setActiveSuggestionIndex((prevIndex) =>
-        prevIndex === filteredData!.length - 1 ? 0 : prevIndex + 1,
+        prevIndex === filteredData.length - 1 ? 0 : prevIndex + 1,
       );
     } else if (e.key === 'ArrowUp') {
       setActiveSuggestionIndex((prevIndex) =>
-        prevIndex === 0 ? filteredData!.length - 1 : prevIndex - 1,
+        prevIndex === 0 ? filteredData.length - 1 : prevIndex - 1,
       );
     } else if (e.key === 'Enter') {
-      setSearchTerm(filteredData![activeSuggestionIndex]);
+      setSearchTerm(filteredData[activeSuggestionIndex]);
       setActiveSuggestionIndex(0);
       handleSearch();
-      inputRef.current!.blur();
+      if (inputRef.current) {
+        inputRef.current.blur();
+      }
     }
   };
 
   useEffect(() => {
     handleQuickSuggest();
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, handleQuickSuggest]);
 
   return (
     <div className='relative focus-within:border-blue-300 max-w-[1120px] w-full border border-gray-300 rounded-md flex items-center px-1'>

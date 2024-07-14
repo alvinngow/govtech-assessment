@@ -15,10 +15,6 @@ import {getQuickSuggest, QuickSuggestResp} from '../queries/getQuickSuggest';
 
 jest.mock('../queries/getQuickSuggest');
 
-const mockedGetQuickSuggest = getQuickSuggest as jest.Mock<
-  Promise<QuickSuggestResp>
->;
-
 const queryClient = new QueryClient();
 
 const renderComponent = () =>
@@ -31,17 +27,6 @@ const renderComponent = () =>
 describe('App', () => {
   beforeEach(() => {
     queryClient.clear();
-    mockedGetQuickSuggest.mockResolvedValue({
-      stemmedQueryTerm: 'child',
-      suggestions: [
-        'child care',
-        'child vaccination',
-        'child health',
-        'child education',
-        'child development account',
-        'register childcare',
-      ],
-    });
   });
 
   it('renders the masthead and search bar', () => {
