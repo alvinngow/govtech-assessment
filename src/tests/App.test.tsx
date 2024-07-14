@@ -10,14 +10,11 @@ import {
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import App from './App';
-import {getQuickSuggest} from './queries/getQuickSuggest';
-import {QuickSuggestResp} from './queries/getQuickSuggest';
+import App from '../App';
+import {getQuickSuggest, QuickSuggestResp} from '../queries/getQuickSuggest';
 
-// Mock the getQuickSuggest function
-jest.mock('./queries/getQuickSuggest');
+jest.mock('../queries/getQuickSuggest');
 
-// Explicitly type the mock
 const mockedGetQuickSuggest = getQuickSuggest as jest.Mock<
   Promise<QuickSuggestResp>
 >;
@@ -34,16 +31,7 @@ const renderComponent = () =>
 describe('App', () => {
   beforeEach(() => {
     queryClient.clear();
-  });
-
-  it('renders the masthead and search bar', () => {
-    renderComponent();
-    expect(screen.getByPlaceholderText('Search')).toBeInTheDocument();
-    expect(screen.getByRole('button')).toBeInTheDocument();
-  });
-
-  it('displays suggestions when typing', async () => {
-    mockedGetQuickSuggest.mockResolvedValueOnce({
+    mockedGetQuickSuggest.mockResolvedValue({
       stemmedQueryTerm: 'child',
       suggestions: [
         'child care',
@@ -54,7 +42,15 @@ describe('App', () => {
         'register childcare',
       ],
     });
+  });
 
+  it('renders the masthead and search bar', () => {
+    renderComponent();
+    expect(screen.getByPlaceholderText('Search')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeInTheDocument();
+  });
+
+  it('displays suggestions when typing', async () => {
     renderComponent();
     const input = screen.getByPlaceholderText('Search');
 
@@ -65,7 +61,7 @@ describe('App', () => {
     await waitFor(() => {
       const suggestionContainer = screen.getByRole('listbox');
       const suggestions = within(suggestionContainer).getAllByRole('option');
-      expect(suggestions.length).toBe(6); // Ensure we have the right number of suggestions
+      expect(suggestions.length).toBe(6);
       expect(suggestions[0].innerHTML).toContain('<b>child</b> care');
       expect(suggestions[1].innerHTML).toContain('<b>child</b> vaccination');
       expect(suggestions[2].innerHTML).toContain('<b>child</b> health');
@@ -78,18 +74,6 @@ describe('App', () => {
   });
 
   it('highlights suggestions using keyboard navigation', async () => {
-    mockedGetQuickSuggest.mockResolvedValueOnce({
-      stemmedQueryTerm: 'child',
-      suggestions: [
-        'child care',
-        'child vaccination',
-        'child health',
-        'child education',
-        'child development account',
-        'register childcare',
-      ],
-    });
-
     renderComponent();
     const input = screen.getByPlaceholderText('Search');
 
@@ -100,15 +84,7 @@ describe('App', () => {
     await waitFor(() => {
       const suggestionContainer = screen.getByRole('listbox');
       const suggestions = within(suggestionContainer).getAllByRole('option');
-      expect(suggestions.length).toBe(6); // Ensure we have the right number of suggestions
-      expect(suggestions[0].innerHTML).toContain('<b>child</b> care');
-      expect(suggestions[1].innerHTML).toContain('<b>child</b> vaccination');
-      expect(suggestions[2].innerHTML).toContain('<b>child</b> health');
-      expect(suggestions[3].innerHTML).toContain('<b>child</b> education');
-      expect(suggestions[4].innerHTML).toContain(
-        '<b>child</b> development account',
-      );
-      expect(suggestions[5].innerHTML).toContain('register <b>child</b>care');
+      expect(suggestions.length).toBe(6);
     });
 
     await act(async () => {
@@ -156,17 +132,21 @@ describe('App', () => {
     });
   });
 
-  it('clears input when clicking the clear icon', () => {
+  it('clears input when clicking the clear icon', async () => {
     renderComponent();
     const input = screen.getByPlaceholderText('Search');
 
-    userEvent.type(input, 'child');
+    await act(async () => {
+      userEvent.type(input, 'child');
+    });
 
     expect(input).toHaveValue('child');
 
     const clearButton = screen.getByTestId('clearSearch');
 
-    fireEvent.click(clearButton);
+    await act(async () => {
+      fireEvent.click(clearButton);
+    });
 
     expect(input).toHaveValue('');
   });

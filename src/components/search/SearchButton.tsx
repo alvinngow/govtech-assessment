@@ -11,7 +11,8 @@ const SearchButton: React.FC<SearchButtonProps> = (props) => {
   return (
     <button
       className='bg-[#1c76d5] p-4 flex -mr-1 rounded-md text-white'
-      onClick={() => searchAction()}>
+      onClick={() => searchAction()}
+      data-testid='searchButton'>
       <IconSearch></IconSearch>
       <p className='ml-2'> Search</p>
     </button>
