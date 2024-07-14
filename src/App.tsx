@@ -4,6 +4,7 @@ import SearchBar from './components/search/SearchBar';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {SearchResp} from './queries/getSearchResults';
 import SearchResOptions from './components/search/SearchResOptions';
+import Pagination from './components/common/Pagination';
 
 const defaultQueryClient = new QueryClient();
 
@@ -17,30 +18,38 @@ function App({queryClient = defaultQueryClient}: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <div>
-        <Masthead />
-        <div className='h-36 shadow-md flex justify-center items-center'>
-          <SearchBar setSearchRes={setSearchRes} />
-        </div>
-        {searchRes && (
-          <div className='w-full flex justify-center'>
-            <div className='w-full max-w-[1120px]'>
-              <div className='mt-8'>
-                <p
-                  style={{fontFamily: 'Open Sans'}}
-                  className='font-semibold text-2xl'>
-                  Showing {searchRes.Page} -{' '}
-                  {searchRes.Page * searchRes.PageSize} of{' '}
-                  {searchRes.TotalNumberOfResults}
-                </p>
-              </div>
-              <div>
-                {searchRes.ResultItems.map((item) => (
-                  <SearchResOptions key={item.DocumentId} item={item} />
-                ))}
-              </div>
-            </div>
+        <div className='sticky top-0 '>
+          <Masthead />
+          <div className='h-36 shadow-md flex justify-center items-center bg-white'>
+            <SearchBar setSearchRes={setSearchRes} />
           </div>
-        )}
+        </div>
+        <div className='w-full flex flex-col items-center'>
+          {searchRes && (
+            <>
+              <div className='w-full max-w-[1120px]'>
+                <div className='mt-8'>
+                  <p
+                    style={{fontFamily: 'Open Sans'}}
+                    className='font-semibold text-2xl'>
+                    Showing {searchRes.Page} -{' '}
+                    {searchRes.Page * searchRes.PageSize} of{' '}
+                    {searchRes.TotalNumberOfResults}
+                  </p>
+                </div>
+                <div>
+                  {searchRes.ResultItems.map((item) => (
+                    <SearchResOptions key={item.DocumentId} item={item} />
+                  ))}
+                </div>
+              </div>
+              <Pagination
+                totalPages={searchRes.TotalNumberOfResults / searchRes.PageSize}
+                currentPage={searchRes.Page}
+              />
+            </>
+          )}
+        </div>
       </div>
     </QueryClientProvider>
   );
