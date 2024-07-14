@@ -20,11 +20,11 @@ function App({queryClient = defaultQueryClient}: AppProps) {
       <div>
         <div className='sticky top-0 '>
           <Masthead />
-          <div className='h-36 shadow-md flex justify-center items-center bg-white'>
+          <div className='px-4 h-36 shadow-md flex justify-center items-center bg-white'>
             <SearchBar setSearchRes={setSearchRes} />
           </div>
         </div>
-        <div className='w-full flex flex-col items-center'>
+        <div className='w-full flex flex-col items-center px-4'>
           {searchRes && (
             <>
               <div className='w-full max-w-[1120px]'>

@@ -10,7 +10,7 @@ const PaginationPages = (props: PaginationPagesProps) => {
   const {number, currentPage} = props;
 
   const pageClassName = classNames('p-2 rounded-lg hover:cursor-pointer', {
-    'text-white bg-blue-300': currentPage === number,
+    'text-white bg-blue-600': currentPage === number,
   });
 
   return (
