@@ -10,7 +10,6 @@ import React, {
   useState,
 } from 'react';
 import useDebounce from '../../hooks/useDebounce';
-import {getQuickSuggest, QuickSuggestResp} from '../../queries/getQuickSuggest';
 import {getSearchResults, SearchResp} from '../../queries/getSearchResults';
 import Spinner from '../common/Spinner';
 import QuickSuggest from './QuickSuggest';
@@ -18,6 +17,11 @@ import SearchButton from './SearchButton';
 
 type SearchBarProps = {
   setSearchRes: Dispatch<SetStateAction<SearchResp | undefined>>;
+};
+
+export type QuickSuggestResp = {
+  stemmedQueryTerm: string;
+  suggestions: string[];
 };
 
 const SearchBar: React.FC<SearchBarProps> = (props) => {
@@ -40,10 +44,9 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
   // Assumes that we're not using URL searchParams
   const handleQuickSuggest = useCallback(async () => {
     setIsQuickSuggestLoading(true);
-    const res = await queryClient.fetchQuery({
-      queryKey: ['quickSuggest'],
-      queryFn: getQuickSuggest,
-    });
+    const url =
+      'https://gist.githubusercontent.com/yuhong90/b5544baebde4bfe9fe2d12e8e5502cbf/raw/e026dab444155edf2f52122aefbb80347c68de86/suggestion.json';
+    const res = await fetch(url);
 
     if (res.ok) {
       const data = await res.json();
@@ -114,6 +117,7 @@ const SearchBar: React.FC<SearchBarProps> = (props) => {
         onFocus={() => setIsInputFocused(true)}
         onBlur={() => setIsInputFocused(false)}
         ref={inputRef}
+        data-testid='SearchBar'
       />
       {searchTerm.length > 0 && (
         <IconX

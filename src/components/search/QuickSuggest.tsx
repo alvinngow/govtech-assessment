@@ -28,7 +28,7 @@ const QuickSuggest: React.FC<QuickSuggestProps> = (props) => {
           return (
             <p
               className={`px-3 py-2 cursor-pointer ${
-                index == activeSuggestionIndex && 'bg-gray-200'
+                index === activeSuggestionIndex && 'bg-gray-200'
               }`}
               key={suggestion}
               onMouseEnter={() => setActiveSuggestionIndex(index)}

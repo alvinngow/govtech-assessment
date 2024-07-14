@@ -11,9 +11,6 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import App from '../App';
-import {getQuickSuggest, QuickSuggestResp} from '../queries/getQuickSuggest';
-
-jest.mock('../queries/getQuickSuggest');
 
 const queryClient = new QueryClient();
 
@@ -28,7 +25,6 @@ describe('App', () => {
   beforeEach(() => {
     queryClient.clear();
   });
-
   it('renders the masthead and search bar', () => {
     renderComponent();
     expect(screen.getByPlaceholderText('Search')).toBeInTheDocument();
@@ -119,13 +115,13 @@ describe('App', () => {
 
   it('clears input when clicking the clear icon', async () => {
     renderComponent();
-    const input = screen.getByPlaceholderText('Search');
+    const searchBar = screen.getByPlaceholderText('Search');
 
     await act(async () => {
-      userEvent.type(input, 'child');
+      fireEvent.change(searchBar, {target: {value: 'child'}});
     });
 
-    expect(input).toHaveValue('child');
+    expect(searchBar).toHaveValue('child');
 
     const clearButton = screen.getByTestId('clearSearch');
 
@@ -133,6 +129,6 @@ describe('App', () => {
       fireEvent.click(clearButton);
     });
 
-    expect(input).toHaveValue('');
+    expect(searchBar).toHaveValue('');
   });
 });
